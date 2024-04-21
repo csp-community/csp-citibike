@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective/dist/cdn/perspective.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/cdn/perspective-viewer.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-datagrid/dist/cdn/perspective-viewer-datagrid.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-d3fc/dist/cdn/perspective-viewer-d3fc.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-d3fc/dist/cdn/perspective-viewer-openlayers.js"></script>
+    <link rel="stylesheet" crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/css/pro.css"/>
+    <style>
+      body {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      perspective-viewer {
+        height: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <perspective-viewer id="map"></perspective-viewer>
+    <perspective-viewer id="grid"></perspective-viewer>
+  </body>
+</html>
