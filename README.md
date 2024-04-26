@@ -16,4 +16,11 @@ pip install csp httpx pandas
 
 ## Example
 
-See [Example.ipynb](./Example.ipynb)
+- [Realtime.ipynb](./Realtime.ipynb)
+- [Historical.ipynb](./Historical.ipynb)
+
+## Web App
+
+```bash
+python -m csp_citibike.webapp
+```
