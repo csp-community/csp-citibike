@@ -24,3 +24,5 @@ pip install csp httpx pandas
 ```bash
 python -m csp_citibike.webapp
 ```
+
+![Picture of citibike availability map and grid](https://raw.githubusercontent.com/csp-community/csp-citibike/main/docs/app.png)
