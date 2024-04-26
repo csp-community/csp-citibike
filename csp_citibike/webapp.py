@@ -1,24 +1,23 @@
 import asyncio
-import csp
 import logging
 import os.path
 import threading
+from datetime import datetime, timedelta
+
+import csp
 import uvicorn
 from csp import ts
-from datetime import datetime, timedelta
-from fastapi import FastAPI
-from perspective import Table as PerspectiveTable, PerspectiveManager, PerspectiveStarletteHandler
-
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
+from perspective import PerspectiveManager, PerspectiveStarletteHandler
+from perspective import Table as PerspectiveTable
 from starlette.staticfiles import StaticFiles
-
 
 from csp_citibike import get_station_status
 
 
 def make_perspective_app(manager: PerspectiveManager):
-    '''Code to create a Perspective webserver. This code is adapted from
+    """Code to create a Perspective webserver. This code is adapted from
     https://github.com/finos/perspective/blob/master/examples/python-starlette/server.py
 
     Args:
@@ -26,7 +25,8 @@ def make_perspective_app(manager: PerspectiveManager):
 
     Returns:
         app: returns the FastAPI back
-    '''
+    """
+
     def perspective_thread(manager):
         # This thread runs the perspective processing callback
         psp_loop = asyncio.new_event_loop()
@@ -45,7 +45,16 @@ def make_perspective_app(manager: PerspectiveManager):
 
     app = FastAPI()
     app.add_api_websocket_route("/websocket", websocket_handler)
-    app.mount("/", StaticFiles(directory=os.path.join(os.path.abspath(os.path.dirname(__file__)), "static"), html=True), name="static")
+    app.mount(
+        "/",
+        StaticFiles(
+            directory=os.path.join(
+                os.path.abspath(os.path.dirname(__file__)), "static"
+            ),
+            html=True,
+        ),
+        name="static",
+    )
 
     app.add_middleware(
         CORSMiddleware,
@@ -61,6 +70,7 @@ def make_perspective_app(manager: PerspectiveManager):
 def push_to_perspective_table(data: ts[list], table: PerspectiveTable):
     if csp.ticked(data):
         table.update(data)
+
 
 @csp.node
 def poll_data(interval: timedelta) -> ts[[dict]]:
@@ -82,37 +92,42 @@ def poll_data(interval: timedelta) -> ts[[dict]]:
         csp.schedule_alarm(a_poll, interval, True)
         return to_return
 
+
 @csp.graph
 def main_graph(table: PerspectiveTable, interval: timedelta = timedelta(seconds=60)):
     # push all of our data to 4 separate perspective tables
     data = poll_data(interval)
     push_to_perspective_table(data, table)
 
+
 def run_csp(manager: PerspectiveManager):
-    '''Connect to csp to perspective and load data
+    """Connect to csp to perspective and load data
 
     Args:
         manager (PerspectiveManager): PerspectiveManager instance (hosts the tables)
-    '''
-    table = PerspectiveTable({
-      "station_id": str,
-      "lat": float,
-      "capacity": int,
-      "lon": float,
-      "name": str,
-      "num_scooters_available": int,
-      "num_scooters_unavailable": int,
-      "num_docks_disabled": int,
-      "last_reported": datetime,
-      "num_bikes_disabled": int,
-      "is_renting": bool,
-      "is_returning": bool,
-      "num_docks_available": int,
-      "is_installed": bool,
-      "num_ebikes_available": int,
-      "num_bikes_available": int,
-      "total_bikes_available": int,
-      }, index="station_id")
+    """
+    table = PerspectiveTable(
+        {
+            "station_id": str,
+            "lat": float,
+            "capacity": int,
+            "lon": float,
+            "name": str,
+            "num_scooters_available": int,
+            "num_scooters_unavailable": int,
+            "num_docks_disabled": int,
+            "last_reported": datetime,
+            "num_bikes_disabled": int,
+            "is_renting": bool,
+            "is_returning": bool,
+            "num_docks_available": int,
+            "is_installed": bool,
+            "num_ebikes_available": int,
+            "num_bikes_available": int,
+            "total_bikes_available": int,
+        },
+        index="station_id",
+    )
 
     # host these tables
     manager.host_table("data", table)
@@ -129,6 +144,7 @@ def main():
     run_csp(perspective_manager)
     logging.critical("Listening on http://localhost:8080")
     uvicorn.run(app, host="0.0.0.0", port=8080)
+
 
 if __name__ == "__main__":
     main()
